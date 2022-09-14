@@ -1,7 +1,9 @@
 import numpy as np
 import torch
 from datasets import load_dataset, load_metric
-from transformers import DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
+# from transformers import DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
+from gaudi_classes import Seq2SeqGaudiTrainingArguments, Seq2SeqGaudiTrainer
+from transformers import DataCollatorForSeq2Seq
 # from transformers import ProphetNetTokenizer, ProphetNetForConditionalGeneration, 
 from transformers import XLMProphetNetForConditionalGeneration, XLMProphetNetTokenizer
 
@@ -97,7 +99,7 @@ class ProphetNetDataCollatorForQG(DataCollatorForSeq2Seq):
 ## Fine-tune
 data_collator = ProphetNetDataCollatorForQG(tokenizer=tokenizer, max_length=512)
 
-training_args = Seq2SeqTrainingArguments(
+training_args = Seq2SeqGaudiTrainingArguments(
     output_dir="./"+task+"/"+model_name,
     overwrite_output_dir=True,
     evaluation_strategy="epoch",
@@ -117,7 +119,7 @@ training_args = Seq2SeqTrainingArguments(
     save_strategy="epoch"
 )
 
-trainer = Seq2SeqTrainer(
+trainer = Seq2SeqGaudiTrainer(
     model=model,
     args=training_args,
     data_collator=data_collator,

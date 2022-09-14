@@ -1,7 +1,9 @@
 import numpy as np
 import torch
 from datasets import load_dataset
-from transformers import DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
+# from transformers import DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
+from gaudi_classes import Seq2SeqGaudiTrainingArguments, Seq2SeqGaudiTrainer 
+from transformers import DataCollatorForSeq2Seq
 # from transformers import ProphetNetConfig, ProphetNetTokenizer, ProphetNetForConditionalGeneration
 from transformers import XLMProphetNetConfig, XLMProphetNetTokenizer, XLMProphetNetForConditionalGeneration
 
@@ -81,7 +83,7 @@ class ProphetNetDataCollator(DataCollatorForSeq2Seq):
 
 
 ## Trainer for ProphetNet
-class ProphetNetTrainer(Seq2SeqTrainer):
+class ProphetNetTrainer(Seq2SeqGaudiTrainer):
     
     def compute_loss(self, model, inputs, return_outputs=False, gamma=1, n=2):
         alpha = gamma / n
@@ -142,7 +144,7 @@ else:
 ## Pre-train
 data_collator = ProphetNetDataCollator(tokenizer=tokenizer, max_length=512)
 
-training_args = Seq2SeqTrainingArguments(
+training_args = Seq2SeqGaudiTrainingArguments(
     output_dir="./"+model_size,
     overwrite_output_dir=True,
     evaluation_strategy="steps",
