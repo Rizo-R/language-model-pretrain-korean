@@ -2,13 +2,17 @@ import numpy as np
 import torch
 from datasets import load_dataset, load_metric
 # from transformers import DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
-from gaudi_classes import Seq2SeqGaudiTrainingArguments, Seq2SeqGaudiTrainer
+from gaudi_classes import GaudiConfig, Seq2SeqGaudiTrainingArguments, Seq2SeqGaudiTrainer
 from transformers import DataCollatorForSeq2Seq
 # from transformers import ProphetNetTokenizer, ProphetNetForConditionalGeneration, 
 from transformers import XLMProphetNetForConditionalGeneration, XLMProphetNetTokenizer
 
+import json
+from optimum.habana import GaudiConfig
 
 
+
+GAUDI_CONFIG_PATH = "./gaudi_config.json"
 
 ## Specify the task (qg)
 task = "qg"
@@ -116,8 +120,16 @@ training_args = Seq2SeqGaudiTrainingArguments(
     lr_scheduler_type="linear",
     warmup_ratio=0.1,
     logging_strategy="epoch",
-    save_strategy="epoch"
+    save_strategy="epoch",
+    # New lines
+    use_habana=True,
+    use_lazy_mode=True,
+    gaudi_config_name="./gaudi_config.json",
 )
+
+# Create GaudiConfig object from JSON file to pass into the ProphetNetTrainer object.
+gaudi_data = json.load(open(GAUDI_CONFIG_PATH))
+gaudi_config = GaudiConfig(**gaudi_data)
 
 trainer = Seq2SeqGaudiTrainer(
     model=model,

@@ -1,3 +1,4 @@
+from telnetlib import GA
 import numpy as np
 import torch
 from datasets import load_dataset
@@ -7,8 +8,11 @@ from transformers import DataCollatorForSeq2Seq
 # from transformers import ProphetNetConfig, ProphetNetTokenizer, ProphetNetForConditionalGeneration
 from transformers import XLMProphetNetConfig, XLMProphetNetTokenizer, XLMProphetNetForConditionalGeneration
 
+import json
+from optimum.habana import GaudiConfig
 
 
+GAUDI_CONFIG_PATH = "./gaudi_config.json"
 
 ## Specifiy which model to train (base/large)
 model_size = "base"
@@ -166,8 +170,13 @@ training_args = Seq2SeqGaudiTrainingArguments(
     logging_steps=100000,
     save_strategy="steps",
     save_steps=100000,
-    remove_unused_columns=False
+    remove_unused_columns=False,
+    gaudi_config_name=GAUDI_CONFIG_PATH,
 )
+
+# Create a GaudiConfig object from JSON file to pass into the ProphetNetTrainer object.
+gaudi_data = json.load(open(GAUDI_CONFIG_PATH))
+gaudi_config = GaudiConfig(**gaudi_data)
 
 trainer = ProphetNetTrainer(
     model=model,
@@ -175,7 +184,8 @@ trainer = ProphetNetTrainer(
     data_collator=data_collator,
     train_dataset=pretrain_data["train"],
     eval_dataset=pretrain_data["test"],
-    tokenizer=tokenizer
+    tokenizer=tokenizer,
+    gaudi_config=gaudi_config,
 )
 
 trainer.train()
