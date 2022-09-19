@@ -124,7 +124,7 @@ training_args = Seq2SeqGaudiTrainingArguments(
     # New lines
     use_habana=True,
     use_lazy_mode=True,
-    gaudi_config_name="./gaudi_config.json",
+    gaudi_config_name=GAUDI_CONFIG_PATH,
 )
 
 # Create GaudiConfig object from JSON file to pass into the ProphetNetTrainer object.
@@ -137,7 +137,8 @@ trainer = Seq2SeqGaudiTrainer(
     data_collator=data_collator,
     train_dataset=finetune_data["train"],
     eval_dataset=finetune_data["eval"],
-    tokenizer=tokenizer
+    tokenizer=tokenizer,
+    gaudi_config=gaudi_config,
 )
 
 trainer.train()
